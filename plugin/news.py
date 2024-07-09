@@ -20,7 +20,7 @@ def get_news(_date=None):
             return False
     file_path = "/var/downloads/" + d.strftime("%Y-%m-%d") + '.jpg'
     if os.path.exists(file_path):
-        return "http://47.120.15.5/" + file_path
+        return "http://47.120.15.5/" + file_path[5:]
 
     # 判断日期是否有效
     if d == datetime.today().date():
