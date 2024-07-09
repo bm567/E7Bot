@@ -28,7 +28,7 @@ def get_news(_date=None):
     elif d > datetime.today().date():
         return False
     else:
-        url = f"https://ravelloh.github.io/EverydayNews/{year}/{month}/{d.strftime("%Y-%m-%d")}.jpg"
+        url = f"https://ravelloh.github.io/EverydayNews/{year}/{month}/{d.strftime('%Y-%m-%d')}.jpg"
     r = requests.get(url)
     if r.status_code == 200:
         with open(file_path, 'wb') as file:
