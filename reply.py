@@ -8,6 +8,7 @@ from botpy.ext.cog_yaml import read
 from botpy.message import GroupMessage, Message, C2CMessage
 
 from plugin.dogs import dog
+from plugin.news import get_news
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
@@ -32,6 +33,27 @@ class MyClient(botpy.Client):
                     msg_type=0,
                     msg_id=message.id,
                     content="接口异常")
+        elif "新闻" in message.content:
+            if get_news():
+                media = await self.api.post_group_file(
+                    group_openid=message.group_openid,
+                    file_type=1,
+                    url=get_news()
+                )
+                send = await self.api.post_group_message(
+                    group_openid=message.group_openid,
+                    msg_type=1,
+                    media=media,
+                    msg_id=message.id
+                )
+                _log.info(send)
+            else:
+                send = await self.api.post_group_message(
+                    group_openid=message.group_openid,
+                    msg_type=0,
+                    msg_id=message.id,
+                    content="接口异常")
+                _log.info(send)
         else:
             send = await self.api.post_group_message(
                 group_openid=message.group_openid,
@@ -90,3 +112,4 @@ if __name__ == "__main__":
     intents = botpy.Intents(public_messages=True)
     client = MyClient(intents=intents)
     client.run(appid=test_config["appid"], secret=test_config["secret"])
+    get_news()
