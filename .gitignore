@@ -164,3 +164,4 @@ cython_debug/
 #others
 config.yaml
 .idea
+*.jpg
