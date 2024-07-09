@@ -18,9 +18,9 @@ def get_news(_date=None):
             d = datetime(year, month, day).date()
         except ValueError:
             return False
-    file_path = "/var/downloads/" + d.strftime("%Y-%m-%d") + '.jpg'
-    if os.path.exists(file_path):
-        return "http://47.120.15.5/" + file_path[5:]
+    file_name = d.strftime("%Y-%m-%d") + '.jpg'
+    file_path = "downloads/" + d.strftime("%Y-%m-%d") + '.jpg'
+
 
     # 判断日期是否有效
     if d == datetime.today().date():
@@ -33,7 +33,16 @@ def get_news(_date=None):
     if r.status_code == 200:
         with open(file_path, 'wb') as file:
             file.write(r.content)
-        return file_path
+
+        url = "https://api.imgbb.com/1/upload?expiration=600&key=567adb50b1adcc697dedf730f4074130"
+        files = [
+            ('image', (file_name, open(file_path, 'rb'), 'image/jpeg'))
+        ]
+        response = requests.request("POST", url, files=files)
+        if response.status_code == 200:
+            return response.json()["data"]["url"]
+        else:
+            return False
     else:
         return False
 
