@@ -34,11 +34,13 @@ class MyClient(botpy.Client):
                     msg_id=message.id,
                     content="接口异常")
         elif "新闻" in message.content:
-            if get_news():
+            n = get_news()
+            _log(n)
+            if n:
                 media = await self.api.post_group_file(
                     group_openid=message.group_openid,
                     file_type=1,
-                    url=get_news()
+                    url=n
                 )
                 send = await self.api.post_group_message(
                     group_openid=message.group_openid,
