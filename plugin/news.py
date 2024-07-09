@@ -18,9 +18,9 @@ def get_news(_date=None):
             d = datetime(year, month, day).date()
         except ValueError:
             return False
-    file_path = "downloads/" + d.strftime("%Y-%m-%d") + '.jpg'
+    file_path = "/var/downloads/" + d.strftime("%Y-%m-%d") + '.jpg'
     if os.path.exists(file_path):
-        return file_path
+        return "http://47.120.15.5/" + file_path
 
     # 判断日期是否有效
     if d == datetime.today().date():
