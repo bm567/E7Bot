@@ -8,7 +8,7 @@ from botpy.ext.cog_yaml import read
 from botpy.message import GroupMessage, Message, C2CMessage
 
 from plugin.dogs import dog
-from plugin.news import get_news
+from plugin.news import news
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
@@ -33,15 +33,23 @@ class MyClient(botpy.Client):
                     msg_type=0,
                     msg_id=message.id,
                     content="接口异常")
+            _log.info(send)
         elif "新闻" in message.content:
-            n = get_news()
+            content = message.content.strip()
+            if content.startswith('/'):
+                content = content[1:]
+            if len(content) == 13:
+                date = content[3:]
+                n = news(date)
+            else:
+                n = news()
             if n:
-                media = await message._api.post_group_file(
+                media = await self.api.post_group_file(
                     group_openid=message.group_openid,
                     file_type=1,
-                    url=n
+                    file_data=n
                 )
-                send = await message._api.post_group_message(
+                send = await self.api.post_group_message(
                     group_openid=message.group_openid,
                     msg_type=7,
                     media=media,
@@ -49,7 +57,7 @@ class MyClient(botpy.Client):
                 )
                 _log.info(send)
             else:
-                send = await message._api.post_group_message(
+                send = await self.api.post_group_message(
                     group_openid=message.group_openid,
                     msg_type=0,
                     msg_id=message.id,
@@ -63,44 +71,25 @@ class MyClient(botpy.Client):
         #         content=f"收到了消息：{message.content}")
         # _log.info(send)
 
-    # async def on_c2c_message_create(self, message: C2CMessage):
-    #     if message.attachments:
-    #         for attachment in message.attachments:
-    #             print(attachment)
-    #             if attachment.url:
-    #                 image_url = attachment.url
-    #                 _log.info(f"Image URL: {image_url}")
-    #                 a = await self.api.post_c2c_file(
-    #                     openid=message.author.user_openid,
-    #                     file_type=1,
-    #                     url=image_url,
-    #                 )
-    #                 await self.api.post_c2c_message(
-    #                     openid=message.author.user_openid,
-    #                     msg_type=7,
-    #                     msg_id=message.id,
-    #                     content=f"我收到了你的消息：{message.content}",
-    #                     media=a
-    #                 )
-    #     else:
-    #         if message.content == "舔狗日记":
-    #             if dog().status_code != 200:
-    #                 await self.api.post_c2c_message(
-    #                     openid=message.author.user_openid,
-    #                     msg_type=0, msg_id=message.id,
-    #                     content=f"接口异常"
-    #                 )
-    #             else:
-    #                 await self.api.post_c2c_message(
-    #                     openid=message.author.user_openid,
-    #                     msg_type=0, msg_id=message.id,
-    #                     content=dog().text)
-            # else:
-            #     await self.api.post_c2c_message(
-            #         openid=message.author.user_openid,
-            #         msg_type=0, msg_id=message.id,
-            #         content=f"我收到了你的消息：{message.content}"
-            #     )
+    async def on_c2c_message_create(self, message: C2CMessage):
+        if message.content == "舔狗日记":
+            if dog().status_code != 200:
+                await self.api.post_c2c_message(
+                    openid=message.author.user_openid,
+                    msg_type=0, msg_id=message.id,
+                    content=f"接口异常"
+                )
+            else:
+                await self.api.post_c2c_message(
+                    openid=message.author.user_openid,
+                    msg_type=0, msg_id=message.id,
+                    content=dog().text)
+        elif "新闻" in message.content:
+            await self.api.post_c2c_message(
+                openid=message.author.user_openid,
+                msg_type=0, msg_id=message.id,
+                content=f"我收到了你的消息：{message.content}"
+            )
 
 
 if __name__ == "__main__":
