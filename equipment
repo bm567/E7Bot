@@ -1,0 +1,204 @@
+import random
+
+
+def atk():
+    probabilities = [0.06103] + [0.07353] * 12 + [0.05662]
+    numbers = range(33, 47)
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def atk_p():
+    probabilities = [0.2] * 5
+    numbers = [4, 5, 6, 7, 8]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def defense():
+    ...
+    probabilities = [0.14265] * 7 + [0.00143]
+    numbers = range(28, 36)
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def defense_p():
+    probabilities = [0.2] * 5
+    numbers = [4, 5, 6, 7, 8]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def hp():
+    probabilities = [0.01133] + [0.02221] * 44 + [0.01133]
+    numbers = range(157, 203)
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def hp_p():
+    probabilities = [0.2] * 5
+    numbers = [4, 5, 6, 7, 8]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def speed():
+    probabilities = [0.33223] * 3 + [0.00332]
+    numbers = [2, 3, 4, 5]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def effectiveness():
+    """
+    效果命中
+    :return:
+    """
+    probabilities = [0.2] * 5
+    numbers = [4, 5, 6, 7, 8]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def effect_resistance():
+    """
+    效果抵抗
+    :return:
+    """
+    probabilities = [0.2] * 5
+    numbers = [4, 5, 6, 7, 8]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def crit():
+    """
+    暴击率
+    :return:
+    """
+    probabilities = [0.33333] * 3
+    numbers = [3, 4, 5]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+def crit_dmg():
+    probabilities = [0.25] * 4
+    numbers = [4, 5, 6, 7]
+    random_number = random.choices(numbers, weights=probabilities, k=1)[0]
+    return random_number
+
+
+class Equipment:
+    ATTRS = {1: "攻击", 2: "攻击%", 3: "防御", 4: "防御%", 5: "生命", 6: "生命%", 7: "效果命中", 8: "效果抗性",
+             9: "暴击率", 10: "暴击伤害", 11: "速度"}
+    SUIT = {}
+    RARITY = {}
+    PART = {1: "武器", 2: "头盔", 3: "衣服", 4: "项链", 5: "戒指", 6: "鞋子"}
+
+    def __init__(self) -> None:
+        suit = random.choice(range(1, 20))  #ToDo 套装
+        part = random.choice(range(1, 7))
+        if part == 1:
+            main_attr = 1
+
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr and x != 5 and x != 6], k=4)
+        elif part == 2:
+            main_attr = 5
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr], k=4)
+        elif part == 3:
+            main_attr = 3
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr and x != 1 and x != 2], k=4)
+        elif part == 4:
+            main_attr = random.choice([1, 2, 3, 4, 5, 6, 9, 10])
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr], k=4)
+        elif part == 5:
+            main_attr = random.choice([1, 2, 3, 4, 5, 6, 7, 8])
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr], k=4)
+        else:
+            main_attr = random.choice([1, 2, 3, 4, 5, 6, 11])
+            secondary_attrs = random.sample([x for x in range(1, 12) if x != main_attr], k=4)
+        self.suit = suit
+        self.part = part
+        self.rarity = random.choice(range(1, 5))
+        self.main_attr = main_attr
+        secondary_attrs = {key: None for key in secondary_attrs}
+        for i in secondary_attrs.keys():
+            if i == 1:
+                secondary_attrs[i] = atk()
+            elif i == 2:
+                secondary_attrs[i] = atk_p()
+            elif i == 3:
+                secondary_attrs[i] = defense()
+            elif i == 4:
+                secondary_attrs[i] = defense_p()
+            elif i == 5:
+                secondary_attrs[i] = hp()
+            elif i == 6:
+                secondary_attrs[i] = hp_p()
+            elif i == 7:
+                secondary_attrs[i] = effectiveness()
+            elif i == 8:
+                secondary_attrs[i] = effect_resistance()
+            elif i == 9:
+                secondary_attrs[i] = crit()
+            elif i == 10:
+                secondary_attrs[i] = crit_dmg()
+            elif i == 11:
+                secondary_attrs[i] = speed()
+
+        self.secondary_attrs = secondary_attrs
+        self.count = 0
+
+    def __str__(self):
+        _ = ""
+        for key, value in self.secondary_attrs.items():
+            _ += self.ATTRS[key] + str(value)
+        return f"{self.PART[self.part]},主属性{self.ATTRS[self.main_attr]}, 副属性{_}"
+
+    def strengthen(self):
+        if self.count < 6:
+            secondary_attrs = self.secondary_attrs
+            key, value = random.choice(list(self.secondary_attrs.items()))
+            if key == 1:
+                secondary_attrs[key] = atk() + value
+            elif key == 2:
+                secondary_attrs[key] = atk_p() + value
+            elif key == 3:
+                secondary_attrs[key] = defense() + value
+            elif key == 4:
+                secondary_attrs[key] = defense_p() + value
+            elif key == 5:
+                secondary_attrs[key] = hp() + value
+            elif key == 6:
+                secondary_attrs[key] = hp_p() + value
+            elif key == 7:
+                secondary_attrs[key] = effectiveness() + value
+            elif key == 8:
+                secondary_attrs[key] = effect_resistance() + value
+            elif key == 9:
+                secondary_attrs[key] = crit() + value
+            elif key == 10:
+                secondary_attrs[key] = crit_dmg() + value
+            elif key == 11:
+                secondary_attrs[key] = speed() + value
+            self.count += 1
+        else:
+            raise
+
+
+if __name__ == '__main__':
+    test = Equipment()
+    print(test)
+    test.strengthen()
+    print(test)
+    test.strengthen()
+    print(test)
+    test.strengthen()
+    print(test)
+    test.strengthen()
+    print(test)
+    test.strengthen()
+    print(test)
